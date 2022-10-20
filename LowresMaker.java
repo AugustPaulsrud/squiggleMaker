@@ -29,8 +29,12 @@ public class LowresMaker
         }
 
         drawSinus(image, lineColor, frequency);
+        
+        BufferedImage target = new BufferedImage(width*2, height*2, BufferedImage.TYPE_4BYTE_ABGR);
 
-        saveImage(image, "drawline.png", "png");
+        copyIntoImage(target, width/2, height/2, image);
+
+        saveImage(target, "drawline.png", "png");
     }
     
     public LowresMaker()
@@ -155,6 +159,16 @@ public class LowresMaker
         }
     }
 
+    /**
+     * Maps value in range [aOrig, bOrig] to range [aTarget, bTarget].
+     * 
+     * @param aOrig start of the original range
+     * @param bOrig end of the original ramge
+     * @param aTarget start of the target range
+     * @param bTarget end of the target range
+     * @param value the value to map, must lie in range [aOrig, bOrig]
+     * @return
+     */
     public static double map(double aOrig, double bOrig, double aTarget, double bTarget, double value)
     {
         return ((value-aOrig) / (bOrig-aOrig))*(bTarget-aTarget)+aTarget;
@@ -179,6 +193,25 @@ public class LowresMaker
         int average = sum / (cell.getHeight() * cell.getWidth());
         int avarageGray = 0xFF000000 | (average << 16) | (average << 8) | (average << 0);
         return avarageGray;
+    }
+
+    /**
+     * Copy source image into target image starting at coordinate (startX, startY).
+     * 
+     * @param target the image to write to
+     * @param startX x coordinate of top left corner
+     * @param startY y coordinate of top left corner
+     * @param source the image to copy from
+     */
+    public static void copyIntoImage(BufferedImage target, int startX, int startY, BufferedImage source)
+    {
+        for (int j = 0; j < source.getWidth(); j++)
+        {
+            for (int i = 0; i < source.getHeight(); i++)
+            {
+                target.setRGB(startX+i, startY+j, source.getRGB(i, j));
+            }
+        }
     }
 
     public static String lowresMake(String filename) {
