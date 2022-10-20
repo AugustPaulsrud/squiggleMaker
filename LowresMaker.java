@@ -12,8 +12,20 @@ public class LowresMaker
 
     public static void main(String[] args)  
     {
-        String fileName = args[0];
-        lowresMake(fileName);        
+        if (args.length == 1) {
+            lowresMake(args[0]);        
+        } 
+        else if (args.length == 4)
+        {
+            cellSizeX = Integer.parseInt(args[1]);
+            cellSizeY = Integer.parseInt(args[2]);
+            maximumFrequency = Integer.parseInt(args[3]);
+            lowresMake(args[0]);        
+        }
+        else 
+        {
+            System.out.println("Usage: filename [cellSizeX cellSizeY maximumFrequency]");
+        }
     }
     
     public LowresMaker()
