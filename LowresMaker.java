@@ -8,7 +8,7 @@ public class LowresMaker
     private static int cellSizeX = 25;
     private static int cellSizeY = 25;
 
-    private static double maximumFrequency = 2*Math.PI;
+    private static int maximumFrequency = 8;
 
     public static void main(String[] args)  
     {
@@ -29,7 +29,7 @@ public class LowresMaker
             if (file.createNewFile()) {
             System.out.println("File created: " + file.getName());
             } else {
-            System.out.println("Overwriting already existing file.");
+            System.out.println("Overwriting already existing file... " + filename);
             }
 
             ImageIO.write(image, format, file);
@@ -153,6 +153,11 @@ public class LowresMaker
         return ((value-aOrig) / (bOrig-aOrig))*(bTarget-aTarget)+aTarget;
     }
 
+    public static int discreteMap(double aOrig, double bOrig, int aTarget, int bTarget, double value)
+    {
+        return (int)Math.round(map(aOrig, bOrig, (double)aTarget, (double)bTarget, value));
+    }
+
     public static int averageCellColor(BufferedImage cell) {
 
         int sum = 0;
@@ -230,7 +235,7 @@ public class LowresMaker
                 for (int x = 0; x < xCells; x++)
                 {
                     int color = imageOut.getRGB(x, y);
-                    double frequency = map(0, 255, 0, maximumFrequency, 255 - (color & 0x000000FF));
+                    int frequency = discreteMap(0, 255, 0, maximumFrequency, 255 - (color & 0x000000FF));
 
                     BufferedImage image = new BufferedImage(cellSizeX, cellSizeY, BufferedImage.TYPE_4BYTE_ABGR);
                     for (int i = 0; i < cellSizeX; i++)
