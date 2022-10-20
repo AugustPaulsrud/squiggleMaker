@@ -232,6 +232,8 @@ public class LowresMaker
             // Make the squiggle image!
             for (int y = 0; y < yCells; y++)
             {
+                int prevFrequency = 0;
+
                 for (int x = 0; x < xCells; x++)
                 {
                     int color = imageOut.getRGB(x, y);
@@ -246,8 +248,22 @@ public class LowresMaker
                         }
                     }
 
+
+                    // We want two adjacent sinusoids to be differentiable,
+                    // i.e. we want them to move in the same direction. So
+                    // fiddle about with the sign of the frequency to achieve
+                    // this.
+                    int sign = ((int)Math.signum(prevFrequency));
+                    if (sign != 0)
+                    {
+                        boolean sameParity = ((prevFrequency % 2) == (frequency % 2));
+                        frequency = sign * frequency * (sameParity ? 1 : -1); 
+                    }
+
                     drawSinus(image, 0xFF000000, frequency);
                     copyIntoImage(picture, x*cellSizeX, y*cellSizeY, image);
+
+                    prevFrequency = frequency;
                 }
             } 
 
