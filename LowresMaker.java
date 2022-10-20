@@ -5,36 +5,15 @@ import javax.imageio.ImageIO;
 
 public class LowresMaker
 {
-    private static int xCells = 40;
-    private static int yCells = 40;
+    private static int cellSizeX = 25;
+    private static int cellSizeY = 25;
+
+    private static double maximumFrequency = 2*Math.PI;
 
     public static void main(String[] args)  
     {
-        // String fileName = args[0];
-        // lowresMake(fileName);        
-
-        int width = 40;
-        int height = 40;
-        int frequency = 4;
-        int backgroundColor = 0xFF000000;
-        int lineColor = 0xFFFFFFFF;
-
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                image.setRGB(x, y, backgroundColor);
-            }
-        }
-
-        drawSinus(image, lineColor, frequency);
-        
-        BufferedImage target = new BufferedImage(width*2, height*2, BufferedImage.TYPE_4BYTE_ABGR);
-
-        copyIntoImage(target, width/2, height/2, image);
-
-        saveImage(target, "drawline.png", "png");
+        String fileName = args[0];
+        lowresMake(fileName);        
     }
     
     public LowresMaker()
@@ -209,7 +188,7 @@ public class LowresMaker
         {
             for (int i = 0; i < source.getHeight(); i++)
             {
-                target.setRGB(startX+i, startY+j, source.getRGB(i, j));
+                target.setRGB(startX+j, startY+i, source.getRGB(j, i));
             }
         }
     }
@@ -222,11 +201,11 @@ public class LowresMaker
         try {
             BufferedImage picture = ImageIO.read(new File(filename));  //picture.png
 
+            int xCells = picture.getWidth() / cellSizeX;
+            int yCells = picture.getHeight() / cellSizeY;
+
             //out imagie
             BufferedImage imageOut = new BufferedImage(xCells, yCells, BufferedImage.TYPE_4BYTE_ABGR);
-
-            int cellSizeX = picture.getWidth() / xCells;
-            int cellSizeY = picture.getHeight() / yCells;
 
             for (int y = 0; y < yCells; y++)
             {
@@ -244,6 +223,30 @@ public class LowresMaker
             }
 
             saveImage(imageOut, filename+"Lowres.png", "png");
+
+            // Make the squiggle image!
+            for (int y = 0; y < yCells; y++)
+            {
+                for (int x = 0; x < xCells; x++)
+                {
+                    int color = imageOut.getRGB(x, y);
+                    double frequency = map(0, 255, 0, maximumFrequency, 255 - (color & 0x000000FF));
+
+                    BufferedImage image = new BufferedImage(cellSizeX, cellSizeY, BufferedImage.TYPE_4BYTE_ABGR);
+                    for (int i = 0; i < cellSizeX; i++)
+                    {
+                        for (int j = 0; j < cellSizeY; j++)
+                        {
+                            image.setRGB(i, j, 0xFFFFFFFF);
+                        }
+                    }
+
+                    drawSinus(image, 0xFF000000, frequency);
+                    copyIntoImage(picture, x*cellSizeX, y*cellSizeY, image);
+                }
+            } 
+
+            saveImage(picture, filename+"Squiggle.png", "png");
 
             return "temp";
         }
